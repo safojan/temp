@@ -34,10 +34,13 @@ export const registerUser = (fields, role) => async (dispatch) => {
     dispatch(authRequest());
 
     try {
+        console.log("role",role)
+        console.log("Link",process.env.REACT_APP_BASE_URL);
         const result = await axios.post(`${process.env.REACT_APP_BASE_URL}/${role}Reg`, fields, {
             headers: { 'Content-Type': 'application/json' },
         });
         if (result.data.schoolName) {
+
             dispatch(authSuccess(result.data));
         }
         else if (result.data.school) {
@@ -47,6 +50,7 @@ export const registerUser = (fields, role) => async (dispatch) => {
             dispatch(authFailed(result.data.message));
         }
     } catch (error) {
+        console.log("this is the error : ",error);
         dispatch(authError(error));
     }
 };
