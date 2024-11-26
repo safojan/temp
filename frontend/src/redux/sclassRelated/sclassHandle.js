@@ -9,7 +9,8 @@ import {
     getFailedTwo,
     getSubjectsSuccess,
     getSubDetailsSuccess,
-    getSubDetailsRequest
+    getSubDetailsRequest,
+    getClassAttandace
 } from './sclassSlice';
 
 export const getAllSclasses = (id, address) => async (dispatch) => {
@@ -91,9 +92,26 @@ export const getSubjectDetails = (id, address) => async (dispatch) => {
     try {
         const result = await axios.get(`${process.env.REACT_APP_BASE_URL}/${address}/${id}`);
         if (result.data) {
-            dispatch(getSubDetailsSuccess(result.data));
+            dispatch(getClassAttandace(result.data));
         }
     } catch (error) {
+        dispatch(getError(error));
+    }
+}
+
+export const sGetClassSubjectAttendanceForClass = (classId,subjectId) => async (dispatch) => {
+    dispatch(getRequest());
+    try{
+        const result = await axios.get(`${process.env.REACT_APP_BASE_URL}/Sclass/Attendance/${classId}/${subjectId}`);
+        console.log("the attance data is : ",result);
+        if(result.data.message){
+            dispatch(getFailed(result.data.message));
+        }
+        else{
+            dispatch(getSubjectsSuccess(result.data));
+        }
+    }
+    catch(error){
         dispatch(getError(error));
     }
 }

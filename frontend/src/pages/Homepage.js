@@ -37,7 +37,6 @@ const Homepage = () => {
   const isMobile = useMediaQuery(colorfulTheme.breakpoints.down('md'));
 
   return (
-    <ThemeProvider theme={colorfulTheme}>
       <Container
         maxWidth={false}
         sx={{
@@ -136,7 +135,6 @@ const Homepage = () => {
           </Grid>
         </Grid>
       </Container>
-    </ThemeProvider>
   );
 };
 

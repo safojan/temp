@@ -7,6 +7,7 @@ import { getAllNotices } from '../../../redux/noticeRelated/noticeHandle';
 import { deleteUser } from '../../../redux/userRelated/userHandle';
 import { PlusCircle, Trash2, AlertCircle } from 'lucide-react';
 import Popup from '../../../components/Popup';
+import AttendanceSheet from '../../../components/AttendanceSheet';
 
 const ShowNotices = () => {
     const navigate = useNavigate();
@@ -84,6 +85,7 @@ const ShowNotices = () => {
                     </AnimatePresence>
                 </NoticeGrid>
             )}
+            <AttendanceSheet/>
             <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
         </Container>
     );
@@ -93,7 +95,6 @@ export default ShowNotices;
 
 const Container = styled.div`
     padding: 2rem;
-    background-color: #2F2E41;
     min-height: 100vh;
 `;
 

@@ -4,7 +4,7 @@ const router = require('express').Router();
 
 const { adminRegister, adminLogIn, getAdminDetail} = require('../controllers/admin-controller.js');
 
-const { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents } = require('../controllers/class-controller.js');
+const { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents,sGetClassSubjectAttendance } = require('../controllers/class-controller.js');
 const { complainCreate, complainList } = require('../controllers/complain-controller.js');
 const { noticeCreate, noticeList, deleteNotices, deleteNotice, updateNotice } = require('../controllers/notice-controller.js');
 const {
@@ -51,6 +51,11 @@ router.put("/Student/:id", updateStudent)
 router.put('/UpdateExamResult/:id', updateExamResult)
 
 router.put('/StudentAttendance/:id', studentAttendance)
+
+//const { classId, subjectId } = req.params;
+router.get("/Sclass/Students/:classId/:subjectId", sGetClassSubjectAttendance);
+//example of calling this from the postman with classId = 1 and subjectId = 2
+//http://localhost:5000/Sclass/Students/1/2
 
 router.put('/RemoveAllStudentsSubAtten/:id', clearAllStudentsAttendanceBySubject);
 router.put('/RemoveAllStudentsAtten/:id', clearAllStudentsAttendance);

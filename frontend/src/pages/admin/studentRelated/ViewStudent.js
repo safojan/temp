@@ -19,6 +19,7 @@ import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import Popup from '../../../components/Popup';
+import AttendanceSheet from '../../../components/AttendanceSheet';
 
 const ViewStudent = () => {
     const [showTab, setShowTab] = useState(false);
@@ -102,13 +103,14 @@ const ViewStudent = () => {
     }
 
     const deleteHandler = () => {
-        setMessage("Sorry the delete function has been disabled for now.")
-        setShowPopup(true)
-
-        // dispatch(deleteUser(studentID, address))
-        //     .then(() => {
-        //         navigate(-1)
-        //     })
+        dispatch(deleteUser(studentID, address))
+            .then(() => {
+                navigate(-1)
+            }).then(() => {
+                setMessage("User deleted successfully")
+                showPopup(true);
+            }
+            )
     }
 
     const removeHandler = (id, deladdress) => {
@@ -144,6 +146,7 @@ const ViewStudent = () => {
     });
 
     const StudentAttendanceSection = () => {
+
         const renderTableSection = () => {
             return (
                 <>
@@ -218,6 +221,7 @@ const ViewStudent = () => {
                             )
                         }
                         )}
+                        
                     </Table>
                     <div>
                         Overall Attendance Percentage: {overallAttendancePercentage.toFixed(2)}%
@@ -392,6 +396,8 @@ const ViewStudent = () => {
                         </form>
                     </div>
                 </Collapse> */}
+
+                
             </div>
         )
     }

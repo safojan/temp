@@ -9,7 +9,7 @@ import { PlusCircle, Trash2, Eye } from 'lucide-react';
 import Popup from '../../../components/Popup';
 
 const ShowSubjects = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { subjectsList, loading, error, response } = useSelector((state) => state.sclass);
     const { currentUser } = useSelector(state => state.user)

@@ -101,5 +101,65 @@ const deleteSclasses = async (req, res) => {
     }
 }
 
+const sGetClassSubjectAttendance = async (req, res) => {
+    try {
+        // Get class ID and subject ID from the request parameters
+        const { classId, subjectId } = req.params;
 
-module.exports = { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents };
+        // Find the class by ID to ensure the class exists
+        const sclass = await Sclass.findById(classId);
+        if (!sclass) {
+            return res.status(404).json({ message: 'Class not found' });
+        }
+
+        // Find the subject by ID to ensure the subject exists
+        const subject = await Subject.findById(subjectId).populate('sclassName', 'sclassName').exec();
+        if (!subject) {
+            return res.status(404).json({ message: 'Subject not found' });
+        }
+
+        // Get the current month and year
+        const currentDate = new Date();
+        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+        // Find all students in the class and filter attendance records for the specific subject and the current month
+        const students = await Student.find({ sclassName: classId })
+            .populate('attendance.subName', 'subName')
+            .exec();
+
+        // Filter attendance data for the specific subject and the current month
+        const attendanceData = students.map(student => {
+            const filteredAttendance = student.attendance.filter(record => {
+                // Filter by subject and the current month
+                const attendanceDate = new Date(record.date);
+                return record.subName && record.subName._id.toString() === subjectId &&
+                    attendanceDate >= startOfMonth && attendanceDate <= endOfMonth;
+            });
+
+            return {
+                studentName: student.name,
+                rollNum: student.rollNum,
+                attendance: filteredAttendance.map(record => ({
+                    date: record.date,
+                    status: record.status,
+                    subject: record.subName ? record.subName.subName : 'Unknown'
+                }))
+            };
+        });
+
+        // Send the attendance data in response
+        return res.status(200).json({
+            class: sclass.sclassName,
+            subject: subject.subName,
+            attendanceData
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
+
+    
+
+module.exports = { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents,sGetClassSubjectAttendance };

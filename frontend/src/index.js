@@ -23,7 +23,7 @@ const colorfulTheme = createTheme({
     },
     background: {
       default: '#2F2E41',
-      paper: 'rgb(238 238 238)',
+      paper: '#121212',
     },
     error: {
       main: '#FF5252',
