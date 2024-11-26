@@ -2,17 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { getClassStudents, getSubjectDetails } from '../../../redux/sclassRelated/sclassHandle';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Tab, Container, Typography, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { BlueButton, GreenButton, PurpleButton } from '../../../components/buttonStyles';
-import TableTemplate from '../../../components/TableTemplate';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-
-import InsertChartIcon from '@mui/icons-material/InsertChart';
-import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import TableChartIcon from '@mui/icons-material/TableChart';
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, UserPlus, PlusCircle } from 'lucide-react';
 
 const ViewSubject = () => {
   const navigate = useNavigate()
@@ -27,185 +19,246 @@ const ViewSubject = () => {
     dispatch(getClassStudents(classID));
   }, [dispatch, subjectID, classID]);
 
-  if (error) {
-    console.log(error)
-  }
+  const [activeTab, setActiveTab] = useState('details');
+  const [activeSection, setActiveSection] = useState('attendance');
 
-  const [value, setValue] = useState('1');
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
 
-  const [selectedSection, setSelectedSection] = useState('attendance');
-  const handleSectionChange = (event, newSection) => {
-    setSelectedSection(newSection);
+  const handleSectionChange = (section) => {
+    setActiveSection(section);
   };
-
-  const studentColumns = [
-    { id: 'rollNum', label: 'Roll No.', minWidth: 100 },
-    { id: 'name', label: 'Name', minWidth: 170 },
-  ]
-
-  const studentRows = sclassStudents.map((student) => {
-    return {
-      rollNum: student.rollNum,
-      name: student.name,
-      id: student._id,
-    };
-  })
-
-  const StudentsAttendanceButtonHaver = ({ row }) => {
-    return (
-      <>
-        <BlueButton
-          variant="contained"
-          onClick={() => navigate("/Admin/students/student/" + row.id)}
-        >
-          View
-        </BlueButton>
-        <PurpleButton
-          variant="contained"
-          onClick={() =>
-            navigate(`/Admin/subject/student/attendance/${row.id}/${subjectID}`)
-          }
-        >
-          Take Attendance
-        </PurpleButton>
-      </>
-    );
-  };
-
-  const StudentsMarksButtonHaver = ({ row }) => {
-    return (
-      <>
-        <BlueButton
-          variant="contained"
-          onClick={() => navigate("/Admin/students/student/" + row.id)}
-        >
-          View
-        </BlueButton>
-        <PurpleButton variant="contained"
-          onClick={() => navigate(`/Admin/subject/student/marks/${row.id}/${subjectID}`)}>
-          Provide Marks
-        </PurpleButton>
-      </>
-    );
-  };
-
-  const SubjectStudentsSection = () => {
-    return (
-      <>
-        {getresponse ? (
-          <>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-              <GreenButton
-                variant="contained"
-                onClick={() => navigate("/Admin/class/addstudents/" + classID)}
-              >
-                Add Students
-              </GreenButton>
-            </Box>
-          </>
-        ) : (
-          <>
-            <Typography variant="h5" gutterBottom>
-              Students List:
-            </Typography>
-
-            {selectedSection === 'attendance' &&
-              <TableTemplate buttonHaver={StudentsAttendanceButtonHaver} columns={studentColumns} rows={studentRows} />
-            }
-            {selectedSection === 'marks' &&
-              <TableTemplate buttonHaver={StudentsMarksButtonHaver} columns={studentColumns} rows={studentRows} />
-            }
-
-            <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-              <BottomNavigation value={selectedSection} onChange={handleSectionChange} showLabels>
-                <BottomNavigationAction
-                  label="Attendance"
-                  value="attendance"
-                  icon={selectedSection === 'attendance' ? <TableChartIcon /> : <TableChartOutlinedIcon />}
-                />
-                <BottomNavigationAction
-                  label="Marks"
-                  value="marks"
-                  icon={selectedSection === 'marks' ? <InsertChartIcon /> : <InsertChartOutlinedIcon />}
-                />
-              </BottomNavigation>
-            </Paper>
-
-          </>
-        )}
-      </>
-    )
-  }
 
   const SubjectDetailsSection = () => {
     const numberOfStudents = sclassStudents.length;
 
     return (
-      <>
-        <Typography variant="h4" align="center" gutterBottom>
-          Subject Details
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Subject Name : {subjectDetails && subjectDetails.subName}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Subject Code : {subjectDetails && subjectDetails.subCode}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Subject Sessions : {subjectDetails && subjectDetails.sessions}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Number of Students: {numberOfStudents}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Class Name : {subjectDetails && subjectDetails.sclassName && subjectDetails.sclassName.sclassName}
-        </Typography>
-        {subjectDetails && subjectDetails.teacher ?
-          <Typography variant="h6" gutterBottom>
-            Teacher Name : {subjectDetails.teacher.name}
-          </Typography>
-          :
-          <GreenButton variant="contained"
-            onClick={() => navigate("/Admin/teachers/addteacher/" + subjectDetails._id)}>
+      <DetailsContainer>
+        <h2>Subject Details</h2>
+        <DetailItem>Subject Name: {subjectDetails && subjectDetails.subName}</DetailItem>
+        <DetailItem>Subject Code: {subjectDetails && subjectDetails.subCode}</DetailItem>
+        <DetailItem>Subject Sessions: {subjectDetails && subjectDetails.sessions}</DetailItem>
+        <DetailItem>Number of Students: {numberOfStudents}</DetailItem>
+        <DetailItem>Class Name: {subjectDetails && subjectDetails.sclassName && subjectDetails.sclassName.sclassName}</DetailItem>
+        {subjectDetails && subjectDetails.teacher ? (
+          <DetailItem>Teacher Name: {subjectDetails.teacher.name}</DetailItem>
+        ) : (
+          <AddTeacherButton onClick={() => navigate("/Admin/teachers/addteacher/" + subjectDetails._id)}>
+            <PlusCircle size={20} />
             Add Subject Teacher
-          </GreenButton>
-        }
-      </>
+          </AddTeacherButton>
+        )}
+      </DetailsContainer>
     );
   }
 
+  const SubjectStudentsSection = () => {
+    return (
+      <StudentsContainer>
+        <h2>Students List</h2>
+        {getresponse ? (
+          <AddStudentButton onClick={() => navigate("/Admin/class/addstudents/" + classID)}>
+            <UserPlus size={20} />
+            Add Students
+          </AddStudentButton>
+        ) : (
+          <>
+            <TabContainer>
+              <Tab active={activeSection === 'attendance'} onClick={() => handleSectionChange('attendance')}>Attendance</Tab>
+              <Tab active={activeSection === 'marks'} onClick={() => handleSectionChange('marks')}>Marks</Tab>
+            </TabContainer>
+            <StudentList>
+              {sclassStudents.map((student) => (
+                <StudentItem key={student._id}>
+                  <span>{student.rollNum}</span>
+                  <span>{student.name}</span>
+                  <ButtonGroup>
+                    <ViewButton onClick={() => navigate("/Admin/students/student/" + student._id)}>
+                      <Eye size={20} />
+                      View
+                    </ViewButton>
+                    {activeSection === 'attendance' ? (
+                      <AttendanceButton onClick={() => navigate(`/Admin/subject/student/attendance/${student._id}/${subjectID}`)}>
+                        Take Attendance
+                      </AttendanceButton>
+                    ) : (
+                      <MarksButton onClick={() => navigate(`/Admin/subject/student/marks/${student._id}/${subjectID}`)}>
+                        Provide Marks
+                      </MarksButton>
+                    )}
+                  </ButtonGroup>
+                </StudentItem>
+              ))}
+            </StudentList>
+          </>
+        )}
+      </StudentsContainer>
+    )
+  }
+
+  if (subloading) {
+    return <LoadingMessage>Loading...</LoadingMessage>
+  }
+
   return (
-    <>
-      {subloading ?
-        < div > Loading...</div >
-        :
-        <>
-          <Box sx={{ width: '100%', typography: 'body1', }} >
-            <TabContext value={value}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <TabList onChange={handleChange} sx={{ position: 'fixed', width: '100%', bgcolor: 'background.paper', zIndex: 1 }}>
-                  <Tab label="Details" value="1" />
-                  <Tab label="Students" value="2" />
-                </TabList>
-              </Box>
-              <Container sx={{ marginTop: "3rem", marginBottom: "4rem" }}>
-                <TabPanel value="1">
-                  <SubjectDetailsSection />
-                </TabPanel>
-                <TabPanel value="2">
-                  <SubjectStudentsSection />
-                </TabPanel>
-              </Container>
-            </TabContext>
-          </Box>
-        </>
-      }
-    </>
+    <Container>
+      <TabContainer>
+        <Tab active={activeTab === 'details'} onClick={() => handleTabChange('details')}>Details</Tab>
+        <Tab active={activeTab === 'students'} onClick={() => handleTabChange('students')}>Students</Tab>
+      </TabContainer>
+      <ContentContainer>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'details' && <SubjectDetailsSection />}
+            {activeTab === 'students' && <SubjectStudentsSection />}
+          </motion.div>
+        </AnimatePresence>
+      </ContentContainer>
+    </Container>
   )
 }
 
 export default ViewSubject
+
+const Container = styled.div`
+  background-color: #2F2E41;
+  min-height: 100vh;
+  padding: 2rem;
+`;
+
+const TabContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+`;
+
+const Tab = styled.button`
+  background-color: ${props => props.active ? '#4ECDC4' : '#3A3852'};
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45B7AA;
+  }
+`;
+
+const ContentContainer = styled.div`
+  background-color: #3A3852;
+  border-radius: 10px;
+  padding: 2rem;
+`;
+
+const DetailsContainer = styled.div`
+  color: white;
+
+  h2 {
+    color: #FF6B6B;
+    margin-bottom: 1rem;
+  }
+`;
+
+const DetailItem = styled.p`
+  margin-bottom: 0.5rem;
+`;
+
+const AddTeacherButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4ECDC4;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45B7AA;
+  }
+`;
+
+const StudentsContainer = styled.div`
+  color: white;
+
+  h2 {
+    color: #FF6B6B;
+    margin-bottom: 1rem;
+  }
+`;
+
+const AddStudentButton = styled(AddTeacherButton)``;
+
+const StudentList = styled.div`
+  margin-top: 1rem;
+`;
+
+const StudentItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2F2E41;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const ViewButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4ECDC4;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45B7AA;
+  }
+`;
+
+const AttendanceButton = styled(ViewButton)`
+  background-color: #FF6B6B;
+
+  &:hover {
+background-color: #E85555;
+  }
+`;
+
+const MarksButton = styled(ViewButton)`
+  background-color: #FFD93D;
+  color: #2F2E41;
+
+  &:hover {
+    background-color: #FFC300;
+  }
+`;
+
+const LoadingMessage = styled.div`
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-top: 2rem;
+`;
+

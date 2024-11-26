@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import { User, Mail, Lock, Save } from 'lucide-react';
 import { getSubjectDetails } from '../../../redux/sclassRelated/sclassHandle';
 import Popup from '../../../components/Popup';
 import { registerUser } from '../../../redux/userRelated/userHandle';
 import { underControl } from '../../../redux/userRelated/userSlice';
-import { CircularProgress } from '@mui/material';
 
 const AddTeacher = () => {
   const params = useParams()
@@ -60,47 +62,178 @@ const AddTeacher = () => {
   }, [status, navigate, error, response, dispatch]);
 
   return (
-    <div>
-      <div className="register">
-        <form className="registerForm" onSubmit={submitHandler}>
-          <span className="registerTitle">Add Teacher</span>
-          <br />
-          <label>
-            Subject : {subjectDetails && subjectDetails.subName}
-          </label>
-          <label>
-            Class : {subjectDetails && subjectDetails.sclassName && subjectDetails.sclassName.sclassName}
-          </label>
-          <label>Name</label>
-          <input className="registerInput" type="text" placeholder="Enter teacher's name..."
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            autoComplete="name" required />
-
-          <label>Email</label>
-          <input className="registerInput" type="email" placeholder="Enter teacher's email..."
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email" required />
-
-          <label>Password</label>
-          <input className="registerInput" type="password" placeholder="Enter teacher's password..."
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="new-password" required />
-
-          <button className="registerButton" type="submit" disabled={loader}>
-            {loader ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              'Register'
+    <Container>
+      <FormContainer
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <FormTitle>Add Teacher</FormTitle>
+        <SubjectInfo>
+          <p>Subject: {subjectDetails && subjectDetails.subName}</p>
+          <p>Class: {subjectDetails && subjectDetails.sclassName && subjectDetails.sclassName.sclassName}</p>
+        </SubjectInfo>
+        <Form onSubmit={submitHandler}>
+          <InputGroup>
+            <InputIcon>
+              <User size={20} />
+            </InputIcon>
+            <Input
+              type="text"
+              placeholder="Enter teacher's name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </InputGroup>
+          <InputGroup>
+            <InputIcon>
+              <Mail size={20} />
+            </InputIcon>
+            <Input
+              type="email"
+              placeholder="Enter teacher's email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </InputGroup>
+          <InputGroup>
+            <InputIcon>
+              <Lock size={20} />
+            </InputIcon>
+            <Input
+              type="password"
+              placeholder="Enter teacher's password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </InputGroup>
+          <SubmitButton type="submit" disabled={loader}>
+            {loader ? <Loader /> : (
+              <>
+                <Save size={20} />
+                Register
+              </>
             )}
-          </button>
-        </form>
-      </div>
+          </SubmitButton>
+        </Form>
+      </FormContainer>
       <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
-    </div>
+    </Container>
   )
 }
 
 export default AddTeacher
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #2F2E41;
+`;
+
+const FormContainer = styled(motion.div)`
+  background-color: #3A3852;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+`;
+
+const FormTitle = styled.h2`
+  color: #FF6B6B;
+  text-align: center;
+  margin-bottom: 1.5rem;
+`;
+
+const SubjectInfo = styled.div`
+  color: #B0AEC1;
+  margin-bottom: 1.5rem;
+  text-align: center;
+
+  p {
+    margin: 0.5rem 0;
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  align-items: center;
+  background-color: #2F2E41;
+  border-radius: 5px;
+  overflow: hidden;
+`;
+
+const InputIcon = styled.span`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #4ECDC4;
+  color: white;
+  width: 40px;
+  height: 40px;
+`;
+
+const Input = styled.input`
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background-color: #2F2E41;
+  color: white;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #B0AEC1;
+  }
+`;
+
+const SubmitButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #4ECDC4;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45B7AA;
+  }
+
+  &:disabled {
+    background-color: #B0AEC1;
+    cursor: not-allowed;
+  }
+`;
+
+const Loader = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 2px solid #FFFFFF;
+  border-top: 2px solid #4ECDC4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
