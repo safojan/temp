@@ -13,8 +13,7 @@ import Popup from '../../components/Popup';
 
 const defaultTheme = createTheme();
 
-const AdminRegisterPage = () => {
-
+const AdminRegisterPage = () => {  
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -49,7 +48,7 @@ const AdminRegisterPage = () => {
 
         const fields = { name, email, password, role, schoolName }
         setLoader(true)
-        dispatch(registerUser(fields, role))
+        dispatch(registerUser(fields, "Admin"))
     };
 
     const handleInputChange = (event) => {

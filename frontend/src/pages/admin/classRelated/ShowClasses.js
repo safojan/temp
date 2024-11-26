@@ -16,6 +16,8 @@ import styled from 'styled-components';
 import SpeedDialTemplate from '../../../components/SpeedDialTemplate';
 import Popup from '../../../components/Popup';
 
+
+
 const ShowClasses = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
@@ -145,7 +147,10 @@ const ShowClasses = () => {
   return (
     <>
       {loading ?
-        <div>Loading...</div>
+        <div>
+          <h1>Loading...</h1>
+
+        </div>
         :
         <>
           {getresponse ?

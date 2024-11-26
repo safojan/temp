@@ -1,4 +1,4 @@
-import { Container, Grid, Paper } from '@mui/material'
+import { Container, Grid, Paper } from '@mui/material';
 import SeeNotice from '../../components/SeeNotice';
 import Students from "../../assets/img1.png";
 import Classes from "../../assets/img2.png";
@@ -11,95 +11,130 @@ import { useEffect } from 'react';
 import { getAllSclasses } from '../../redux/sclassRelated/sclassHandle';
 import { getAllStudents } from '../../redux/studentRelated/studentHandle';
 import { getAllTeachers } from '../../redux/teacherRelated/teacherHandle';
+import { createTheme, ThemeProvider, Typography } from '@mui/material';
+
+const colorfulTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#FF6B6B',
+    },
+    secondary: {
+      main: '#4ECDC4',
+    },
+    background: {
+      default: '#2F2E41',
+      paper: '#3E3D53',
+    },
+  },
+  typography: {
+    fontFamily: "'Poppins', sans-serif",
+  },
+});
 
 const AdminHomePage = () => {
-    const dispatch = useDispatch();
-    const { studentsList } = useSelector((state) => state.student);
-    const { sclassesList } = useSelector((state) => state.sclass);
-    const { teachersList } = useSelector((state) => state.teacher);
+  const dispatch = useDispatch();
+  const { studentsList } = useSelector((state) => state.student);
+  const { sclassesList } = useSelector((state) => state.sclass);
+  const { teachersList } = useSelector((state) => state.teacher);
+  const { currentUser } = useSelector((state) => state.user);
 
-    const { currentUser } = useSelector(state => state.user)
+  const adminID = currentUser._id;
 
-    const adminID = currentUser._id
+  useEffect(() => {
+    dispatch(getAllStudents(adminID));
+    dispatch(getAllSclasses(adminID, "Sclass"));
+    dispatch(getAllTeachers(adminID));
+  }, [adminID, dispatch]);
 
-    useEffect(() => {
-        dispatch(getAllStudents(adminID));
-        dispatch(getAllSclasses(adminID, "Sclass"));
-        dispatch(getAllTeachers(adminID));
-    }, [adminID, dispatch]);
+  const numberOfStudents = studentsList && studentsList.length;
+  const numberOfClasses = sclassesList && sclassesList.length;
+  const numberOfTeachers = teachersList && teachersList.length;
 
-    const numberOfStudents = studentsList && studentsList.length;
-    const numberOfClasses = sclassesList && sclassesList.length;
-    const numberOfTeachers = teachersList && teachersList.length;
-
-    return (
-        <>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Students} alt="Students" />
-                            <Title>
-                                Total Students
-                            </Title>
-                            <Data start={0} end={numberOfStudents} duration={2.5} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Classes} alt="Classes" />
-                            <Title>
-                                Total Classes
-                            </Title>
-                            <Data start={0} end={numberOfClasses} duration={5} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Teachers} alt="Teachers" />
-                            <Title>
-                                Total Teachers
-                            </Title>
-                            <Data start={0} end={numberOfTeachers} duration={2.5} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Fees} alt="Fees" />
-                            <Title>
-                                Fees Collection
-                            </Title>
-                            <Data start={0} end={23000} duration={2.5} prefix="$" />                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={12} lg={12}>
-                        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                            <SeeNotice />
-                        </Paper>
-                    </Grid>
-                </Grid>
-            </Container>
-        </>
-    );
+  return (
+    <ThemeProvider theme={colorfulTheme}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          mt: 4,
+          mb: 4,
+          py: 4,
+          background: 'linear-gradient(135deg, #2F2E41 0%, #3E3D53 100%)',
+          borderRadius: 4,
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <StyledPaper>
+              <img src={Students} alt="Students" />
+              <Typography variant="h6" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
+                Total Students
+              </Typography>
+              <StyledData start={0} end={numberOfStudents} duration={2.5} />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <StyledPaper>
+              <img src={Classes} alt="Classes" />
+              <Typography variant="h6" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
+                Total Classes
+              </Typography>
+              <StyledData start={0} end={numberOfClasses} duration={5} />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <StyledPaper>
+              <img src={Teachers} alt="Teachers" />
+              <Typography variant="h6" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
+                Total Teachers
+              </Typography>
+              <StyledData start={0} end={numberOfTeachers} duration={2.5} />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper
+              sx={{
+                p: 2,
+                backgroundColor: 'rgba(62, 61, 83, 0.7)',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <SeeNotice />
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </ThemeProvider>
+  );
 };
-
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  height: 200px;
-  justify-content: space-between;
   align-items: center;
   text-align: center;
+  background-color: rgba(62, 61, 83, 0.7);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  img {
+    max-width: 80px;
+    margin-bottom: 16px;
+  }
 `;
 
-const Title = styled.p`
-  font-size: 1.25rem;
+const StyledData = styled(CountUp)`
+  font-size: calc(1.3rem + 0.6vw);
+  color: #4ECDC4;
+  font-weight: bold;
 `;
 
-const Data = styled(CountUp)`
-  font-size: calc(1.3rem + .6vw);
-  color: green;
-`;
-
-export default AdminHomePage
+export default AdminHomePage;
