@@ -93,7 +93,7 @@ const AttendanceSheet = () => {
   const dispatch = useDispatch();
   const attendanceDataReal=useSelector(state=>state.sclassAttendance);
 
-
+//patially working
   useEffect(() => {
     (sGetClassSubjectAttendanceForClass(classID, subjectID));
     dispatch(sGetClassSubjectAttendanceForClass(classID, subjectID));
