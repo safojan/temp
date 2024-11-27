@@ -1,140 +1,234 @@
-import { Container, Grid, Paper } from '@mui/material';
-import SeeNotice from '../../components/SeeNotice';
-import Students from "../../assets/img1.png";
-import Classes from "../../assets/img2.png";
-import Teachers from "../../assets/img3.png";
-import Fees from "../../assets/img4.png";
+import React from 'react';
 import styled from 'styled-components';
-import CountUp from 'react-countup';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import { getAllSclasses } from '../../redux/sclassRelated/sclassHandle';
-import { getAllStudents } from '../../redux/studentRelated/studentHandle';
-import { getAllTeachers } from '../../redux/teacherRelated/teacherHandle';
-import { createTheme, ThemeProvider, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
+import { Users, BookOpen, GraduationCap, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const colorfulTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#FF6B6B',
-    },
-    secondary: {
-      main: '#4ECDC4',
-    },
-    background: {
-      default: '#2F2E41',
-      paper: '#3E3D53',
-    },
-  },
-  typography: {
-    fontFamily: "'Poppins', sans-serif",
-  },
-});
+const Dashboard = () => {
+    const stats = [
+        { 
+            title: 'Total Students', 
+            count: 2, 
+            icon: <Users size={24} />,
+            color: '#FF6B6B'
+        },
+        { 
+            title: 'Total Classes', 
+            count: 2, 
+            icon: <BookOpen size={24} />,
+            color: '#4ECDC4'
+        },
+        { 
+            title: 'Total Teachers', 
+            count: 1, 
+            icon: <GraduationCap size={24} />,
+            color: '#FFB6B9'
+        }
+    ];
 
-const AdminHomePage = () => {
-  const dispatch = useDispatch();
-  const { studentsList } = useSelector((state) => state.student);
-  const { sclassesList } = useSelector((state) => state.sclass);
-  const { teachersList } = useSelector((state) => state.teacher);
-  const { currentUser } = useSelector((state) => state.user);
+    const notices = [
+        { title: 'Admissions Fall 2024', details: 'admission in the next era', date: '2024-11-20' },
+        { title: 'salkhfjfsa', details: 'fjskdjfhf', date: '2024-11-01' },
+        { title: 'jkldsadf', details: 'sklfjsdlkf', date: '+275759-12' },
+    ];
 
-  const adminID = currentUser._id;
+    return (
+        <Container>
+            <Header>Admin Dashboard</Header>
+            
+            <StatsGrid>
+                {stats.map((stat, index) => (
+                    <StatCard
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                    >
+                        <StatIcon color={stat.color}>{stat.icon}</StatIcon>
+                        <StatContent>
+                            <StatTitle>{stat.title}</StatTitle>
+                            <StatCount style={{ color: stat.color }}>{stat.count}</StatCount>
+                        </StatContent>
+                    </StatCard>
+                ))}
+            </StatsGrid>
 
-  useEffect(() => {
-    dispatch(getAllStudents(adminID));
-    dispatch(getAllSclasses(adminID, "Sclass"));
-    dispatch(getAllTeachers(adminID));
-  }, [adminID, dispatch]);
-
-  const numberOfStudents = studentsList && studentsList.length;
-  const numberOfClasses = sclassesList && sclassesList.length;
-  const numberOfTeachers = teachersList && teachersList.length;
-
-  return (
-    <ThemeProvider theme={colorfulTheme}>
-      <Container
-        maxWidth="lg"
-        sx={{
-          mt: 4,
-          mb: 4,
-          py: 4,
-          background: 'linear-gradient(135deg, #2F2E41 0%, #3E3D53 100%)',
-          borderRadius: 4,
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <StyledPaper>
-              <img src={Students} alt="Students" />
-              <Typography variant="h6" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-                Total Students
-              </Typography>
-              <StyledData start={0} end={numberOfStudents} duration={2.5} />
-            </StyledPaper>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledPaper>
-              <img src={Classes} alt="Classes" />
-              <Typography variant="h6" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-                Total Classes
-              </Typography>
-              <StyledData start={0} end={numberOfClasses} duration={5} />
-            </StyledPaper>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledPaper>
-              <img src={Teachers} alt="Teachers" />
-              <Typography variant="h6" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-                Total Teachers
-              </Typography>
-              <StyledData start={0} end={numberOfTeachers} duration={2.5} />
-            </StyledPaper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper
-              sx={{
-                p: 2,
-                backgroundColor: 'rgba(62, 61, 83, 0.7)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <SeeNotice />
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-    </ThemeProvider>
-  );
+            <NoticesSection>
+                <NoticesTitle>Notices</NoticesTitle>
+                <Table>
+                    <TableHeader>
+                        <tr>
+                            <th>TITLE</th>
+                            <th>DETAILS</th>
+                            <th>DATE</th>
+                        </tr>
+                    </TableHeader>
+                    <TableBody>
+                        {notices.map((notice, index) => (
+                            <TableRow key={index}>
+                                <td>{notice.title}</td>
+                                <td>{notice.details}</td>
+                                <td>{notice.date}</td>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <TableFooter>
+                    <div>Rows per page: 5</div>
+                    <PageInfo>1-3 of 3</PageInfo>
+                    <PaginationButtons>
+                        <PaginationButton disabled><ChevronLeft size={20} /></PaginationButton>
+                        <PaginationButton disabled><ChevronRight size={20} /></PaginationButton>
+                    </PaginationButtons>
+                </TableFooter>
+            </NoticesSection>
+        </Container>
+    );
 };
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  background-color: rgba(62, 61, 83, 0.7);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s;
+export default Dashboard;
 
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 40px rgba(0, 0, 0, 0.3);
-  }
-
-  img {
-    max-width: 80px;
-    margin-bottom: 16px;
-  }
+const Container = styled.div`
+    padding: 2rem;
+    background-color: #2F2E41;
+    min-height: 100vh;
+    color: white;
 `;
 
-const StyledData = styled(CountUp)`
-  font-size: calc(1.3rem + 0.6vw);
-  color: #4ECDC4;
-  font-weight: bold;
+const Header = styled.h1`
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #FF6B6B;
 `;
 
-export default AdminHomePage;
+const StatsGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+`;
+
+const StatCard = styled(motion.div)`
+    background-color: #3A3852;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const StatIcon = styled.div`
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: ${props => `${props.color}15`};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${props => props.color};
+`;
+
+const StatContent = styled.div`
+    flex: 1;
+`;
+
+const StatTitle = styled.div`
+    color: #B0AEC1;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+`;
+
+const StatCount = styled.div`
+    font-size: 2rem;
+    font-weight: 600;
+`;
+
+const NoticesSection = styled.div`
+    background-color: #3A3852;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const NoticesTitle = styled.h2`
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: white;
+`;
+
+const Table = styled.table`
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+`;
+
+const TableHeader = styled.thead`
+    background-color: #FF6B6B;
+    color: white;
+
+    th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 500;
+        &:first-child {
+            border-top-left-radius: 8px;
+        }
+        &:last-child {
+            border-top-right-radius: 8px;
+        }
+    }
+`;
+
+const TableBody = styled.tbody`
+    td {
+        padding: 1rem;
+        color: #B0AEC1;
+    }
+`;
+
+const TableRow = styled.tr`
+    background-color: #2F2E41;
+    
+    &:nth-child(even) {
+        background-color: #343347;
+    }
+
+    &:hover {
+        background-color: #3F3D56;
+    }
+`;
+
+const TableFooter = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 1rem;
+    color: #B0AEC1;
+    gap: 2rem;
+`;
+
+const PageInfo = styled.div`
+    color: #B0AEC1;
+`;
+
+const PaginationButtons = styled.div`
+    display: flex;
+    gap: 0.5rem;
+`;
+
+const PaginationButton = styled.button`
+    background: none;
+    border: none;
+    color: ${props => props.disabled ? '#666' : '#B0AEC1'};
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+
+    &:hover:not(:disabled) {
+        background-color: #4A4861;
+    }
+`;
+

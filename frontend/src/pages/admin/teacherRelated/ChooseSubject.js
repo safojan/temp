@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Table, TableBody, TableContainer, TableHead, Typography, Paper } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, ChevronRight } from 'lucide-react';
 import { getTeacherFreeClassSubjects } from '../../../redux/sclassRelated/sclassHandle';
 import { updateTeachSubject } from '../../../redux/teacherRelated/teacherHandle';
-import { GreenButton, PurpleButton } from '../../../components/buttonStyles';
-import { StyledTableCell, StyledTableRow } from '../../../components/styles';
 
 const ChooseSubject = ({ situation }) => {
     const params = useParams();
@@ -30,23 +30,7 @@ const ChooseSubject = ({ situation }) => {
             setTeacherID(teacherID);
             dispatch(getTeacherFreeClassSubjects(classID));
         }
-    }, [situation]);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    } else if (response) {
-        return <div>
-            <h1>Sorry all subjects have teachers assigned already</h1>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                <PurpleButton variant="contained"
-                    onClick={() => navigate("/Admin/addsubject/" + classID)}>
-                    Add Subjects
-                </PurpleButton>
-            </Box>
-        </div>;
-    } else if (error) {
-        console.log(error)
-    }
+    }, [situation, params, dispatch]);
 
     const updateSubjectHandler = (teacherId, teachSubject) => {
         setLoader(true)
@@ -55,53 +39,166 @@ const ChooseSubject = ({ situation }) => {
     }
 
     return (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <Typography variant="h6" gutterBottom component="div">
-                Choose a subject
-            </Typography>
-            <>
-                <TableContainer>
-                    <Table aria-label="sclasses table">
-                        <TableHead>
-                            <StyledTableRow>
-                                <StyledTableCell></StyledTableCell>
-                                <StyledTableCell align="center">Subject Name</StyledTableCell>
-                                <StyledTableCell align="center">Subject Code</StyledTableCell>
-                                <StyledTableCell align="center">Actions</StyledTableCell>
-                            </StyledTableRow>
-                        </TableHead>
-                        <TableBody>
-                            {Array.isArray(subjectsList) && subjectsList.length > 0 && subjectsList.map((subject, index) => (
-                                <StyledTableRow key={subject._id}>
-                                    <StyledTableCell component="th" scope="row" style={{ color: "white" }}>
-                                        {index + 1}
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">{subject.subName}</StyledTableCell>
-                                    <StyledTableCell align="center">{subject.subCode}</StyledTableCell>
-                                    <StyledTableCell align="center">
-                                        {situation === "Norm" ?
-                                            <GreenButton variant="contained"
-                                                onClick={() => navigate("/Admin/teachers/addteacher/" + subject._id)}>
-                                                Choose
-                                            </GreenButton>
-                                            :
-                                            <GreenButton variant="contained" disabled={loader}
-                                                onClick={() => updateSubjectHandler(teacherID, subject._id)}>
-                                                {loader ? (
-                                                    <div className="load"></div>
-                                                ) : (
-                                                    'Choose Sub'
-                                                )}
-                                            </GreenButton>}
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </>
-        </Paper >
+        <Container>
+            <Header>
+                <h2>Choose a Subject</h2>
+                {response && (
+                    <AddButton onClick={() => navigate("/Admin/addsubject/" + classID)}>
+                        <Plus size={20} />
+                        Add Subjects
+                    </AddButton>
+                )}
+            </Header>
+            {loading ? (
+                <LoadingMessage>Loading...</LoadingMessage>
+            ) : response ? (
+                <Message>Sorry, all subjects have teachers assigned already.</Message>
+            ) : error ? (
+                <ErrorMessage>Error: {error}</ErrorMessage>
+            ) : (
+                <SubjectGrid>
+                    <AnimatePresence>
+                        {Array.isArray(subjectsList) && subjectsList.map((subject) => (
+                            <SubjectCard
+                                key={subject._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <SubjectInfo>
+                                    <SubjectName>{subject.subName}</SubjectName>
+                                    <SubjectCode>{subject.subCode}</SubjectCode>
+                                </SubjectInfo>
+                                {situation === "Norm" ? (
+                                    <ChooseButton onClick={() => navigate("/Admin/teachers/addteacher/" + subject._id)}>
+                                        Choose
+                                        <ChevronRight size={20} />
+                                    </ChooseButton>
+                                ) : (
+                                    <ChooseButton 
+                                        onClick={() => updateSubjectHandler(teacherID, subject._id)}
+                                        disabled={loader}
+                                    >
+                                        {loader ? 'Updating...' : 'Choose Subject'}
+                                        <ChevronRight size={20} />
+                                    </ChooseButton>
+                                )}
+                            </SubjectCard>
+                        ))}
+                    </AnimatePresence>
+                </SubjectGrid>
+            )}
+        </Container>
     );
 };
 
 export default ChooseSubject;
+
+const Container = styled.div`
+    padding: 2rem;
+    background-color: #2F2E41;
+    min-height: 100vh;
+`;
+
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h2 {
+        color: #FF6B6B;
+        font-size: 1.5rem;
+    }
+`;
+
+const AddButton = styled.button`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #4ECDC4;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #45B7AA;
+    }
+`;
+
+const SubjectGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+`;
+
+const SubjectCard = styled(motion.div)`
+    background-color: #3A3852;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const SubjectInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const SubjectName = styled.h3`
+    color: #FF6B6B;
+    margin: 0 0 0.5rem 0;
+`;
+
+const SubjectCode = styled.span`
+    color: #B0AEC1;
+`;
+
+const ChooseButton = styled.button`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #4ECDC4;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #45B7AA;
+    }
+
+    &:disabled {
+        background-color: #B0AEC1;
+        cursor: not-allowed;
+    }
+`;
+
+const LoadingMessage = styled.div`
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 2rem;
+`;
+
+const Message = styled.div`
+    color: #B0AEC1;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 2rem;
+`;
+
+const ErrorMessage = styled.div`
+    color: #FF6B6B;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 2rem;
+`;
+

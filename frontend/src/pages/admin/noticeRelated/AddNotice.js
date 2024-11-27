@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addStuff } from '../../../redux/userRelated/userHandle';
 import { underControl } from '../../../redux/userRelated/userSlice';
-import { CircularProgress, Box, TextField, Button, Typography } from '@mui/material';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import { PlusCircle, AlertCircle } from 'lucide-react';
 import Popup from '../../../components/Popup';
 
 const AddNotice = () => {
@@ -42,79 +44,148 @@ const AddNotice = () => {
   }, [status, navigate, error, response, dispatch]);
 
   return (
-    <Box 
-      display="flex" 
-      justifyContent="center" 
-      alignItems="center" 
-      minHeight="100vh" 
-      bgcolor="background.default" 
-      p={3}
-    >
-      <Box
-        component="form"
-        onSubmit={submitHandler}
-        display="flex"
-        flexDirection="column"
-        gap={3}
-        width={{ xs: '100%', sm: '400px' }}
-        bgcolor="white"
-        boxShadow="0px 4px 12px rgba(0, 0, 0, 0.1)"
-        borderRadius={2}
-        p={4}
+    <Container>
+      <FormCard
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <Typography variant="h5" align="center" fontWeight="bold">
-          Add Notice
-        </Typography>
-
-        <TextField
-          label="Title"
-          variant="outlined"
-          fullWidth
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          required
-        />
-
-        <TextField
-          label="Details"
-          variant="outlined"
-          fullWidth
-          value={details}
-          onChange={(event) => setDetails(event.target.value)}
-          required
-        />
-
-        <TextField
-          label="Date"
-          variant="outlined"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-          required
-        />
-
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={loader}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 'bold',
-            backgroundColor: 'primary.main',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            },
-          }}
-        >
-          {loader ? <CircularProgress size={24} color="inherit" /> : 'Add'}
-        </Button>
-      </Box>
+        <Title>Add Notice</Title>
+        <Form onSubmit={submitHandler}>
+          <Input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <TextArea
+            placeholder="Details"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            required
+          />
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+          <SubmitButton type="submit" disabled={loader}>
+            {loader ? (
+              <Loader />
+            ) : (
+              <>
+                <PlusCircle size={20} />
+                Add Notice
+              </>
+            )}
+          </SubmitButton>
+        </Form>
+      </FormCard>
       <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
-    </Box>
+    </Container>
   );
 };
 
 export default AddNotice;
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #2F2E41;
+  padding: 2rem;
+`;
+
+const FormCard = styled(motion.div)`
+  background-color: #3A3852;
+  border-radius: 10px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const Title = styled.h2`
+  color: #FF6B6B;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Input = styled.input`
+  padding: 0.75rem;
+  border-radius: 5px;
+  border: 1px solid #4A4861;
+  background-color: #2F2E41;
+  color: #FFFFFF;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: #FF6B6B;
+  }
+`;
+
+const TextArea = styled.textarea`
+  padding: 0.75rem;
+  border-radius: 5px;
+  border: 1px solid #4A4861;
+  background-color: #2F2E41;
+  color: #FFFFFF;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+
+  &:focus {
+    outline: none;
+    border-color: #FF6B6B;
+  }
+`;
+
+const SubmitButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #4ECDC4;
+  color: #FFFFFF;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45B7AA;
+  }
+
+  &:disabled {
+    background-color: #4A4861;
+    cursor: not-allowed;
+  }
+`;
+
+const Loader = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 2px solid #FFFFFF;
+  border-top: 2px solid #4ECDC4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
