@@ -85,7 +85,6 @@ const ShowNotices = () => {
                     </AnimatePresence>
                 </NoticeGrid>
             )}
-            <AttendanceSheet/>
             <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
         </Container>
     );
